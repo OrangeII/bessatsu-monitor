@@ -9,6 +9,7 @@ Monitor.MonitorEvents.addListener('BroadcastMessage', (text) => {
 });
 
 const BroadcastMessage = (text) => {
+  if (Config.Environment.TELEGRAM_BROADCAST_CHAT_ID == 0) return;
   bot.sendMessage(Config.Environment.TELEGRAM_BROADCAST_CHAT_ID, text);
 };
 
