@@ -103,10 +103,24 @@ const MonitorLog = (text, broadcast) => {
     MonitorEvents.emit('BroadcastMessage', text);
 }
 
+const GetTaskInfo = (index) => {
+  if (index >= _cronJobs.length) return null;
+  let task = _cronJobs[index];
+  return {
+    index: index,
+    url: task.url,
+    title: task.title,
+    isRunning: task.job.running,
+    lastRun: task.job.lastDate(),
+    nextRun: task.job.nextDate()
+  };
+}
+
 module.exports = {
   StartMonitoring,
   StopMonitoring,
   Lookup,
+  GetTaskInfo,
   MonitorEvents
 };
 

@@ -76,6 +76,20 @@ bot.onText(/\/restartMonitor/, async (msg) => {
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
 });
 
+bot.onText(/\/taskStatus (\d+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const index = Number(match[1]);
+
+  let info = Monitor.GetTaskInfo(index);
+  let response = "";
+  if (!info)
+    response = `there is no task at index ${index}`;
+  else {
+    response = `url: ${info.url}\nStatus: ${info.isRunning ? 'running' : 'not running'}\nLast check: ${info.lastRun}\nNext check: ${info.nextRun}`;
+  }
+
+  bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
+});
 
 module.exports = {
   bot
