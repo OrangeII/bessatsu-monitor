@@ -1,6 +1,7 @@
 const Config = require('./Config.js');
 const TelegramBot = require('node-telegram-bot-api');
 const Monitor = require('./Monitor.js');
+const ScraperTryout = require('./ScraperTryout.js');
 
 const bot = new TelegramBot(Config.Environment.TELEGRAM_API_TOKEN, { polling: true });
 
@@ -68,12 +69,17 @@ bot.onText(/\/updateTask (\d+) (\w+) (.*)/, async (msg, match) => {
 
 bot.onText(/\/restartMonitor/, async (msg) => {
   const chatId = msg.chat.id;
+  let response = "restarting...";
+
+  bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
+  BroadcastMessage(response);
 
   await Monitor.StopMonitoring();
   await Monitor.StartMonitoring();
 
-  let response = "restart successful";
+  response = "restart successful";
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
+  BroadcastMessage(response);
 });
 
 bot.onText(/\/taskStatus (\d+)/, async (msg, match) => {
@@ -88,6 +94,34 @@ bot.onText(/\/taskStatus (\d+)/, async (msg, match) => {
     response = `url: ${info.url}\nStatus: ${info.isRunning ? 'running' : 'not running'}\nLast check: ${info.lastRun}\nNext check: ${info.nextRun}`;
   }
 
+  bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
+});
+
+bot.onText(/\/tryScraper (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  let response = "";
+  let parameters = null;
+  try {
+    parameters = JSON.parse(match[1]);
+  }
+  catch (err) {
+    response = 'malformed request, make sure parameters are in a valid JSON';
+  }
+
+  if (parameters) {
+    if (!('url' in parameters)
+      || !('lookupText' in parameters)
+      || !('htmlQuery' in parameters)) {
+      response = 'parameters must contain "url", "lookupText" and "htmlQuery" fields';
+    } else {
+      bot.sendMessage(chatId, 'handling request...', { reply_to_message_id: msg.message_id });
+      if (await ScraperTryout.TryScraper(parameters)) {
+        response = 'The text was found';
+      } else {
+        response = 'The text was not found';
+      }
+    }
+  }
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
 });
 

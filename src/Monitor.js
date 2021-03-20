@@ -60,7 +60,7 @@ const StartJobs = (cronJobs) => {
   //start CronJobs
   cronJobs.forEach(cronJob => {
     if (!cronJob.job.running) {
-      MonitorLog(`starting task '${cronJob.title}'`, true);
+      MonitorLog(`starting task '${cronJob.title}'`);
       cronJob.job.start();
     }
   });
@@ -72,7 +72,7 @@ const StopJobs = (cronJobs) => {
   //stop CronJobs
   cronJobs.forEach(cronJob => {
     if (cronJob.job.running) {
-      MonitorLog(`stopping task '${cronJob.title}'`, true);
+      MonitorLog(`stopping task '${cronJob.title}'`);
       cronJob.job.stop();
     }
   });
