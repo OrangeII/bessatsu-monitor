@@ -11,7 +11,7 @@ var MonitorEvents = new events.EventEmitter();
 const StartMonitoring = async () => {
   //read config
   let config = await ReadConfig();
-  MonitorLog(`starting monitor on config found:\n${await PrettyTaskList()}`, true);
+  MonitorLog(`starting monitor on config found:\n${await PrettyTaskList()}`);
 
   //open browser
   _browser = await Browser.OpenBrowser();
@@ -48,7 +48,7 @@ const StopMonitoring = async () => {
   if (!_browser)
     return;
 
-  MonitorLog(`stopping monitor`, true);
+  MonitorLog(`stopping monitor`);
   StopJobs(_cronJobs);
   await Browser.CloseBrowser(_browser);
   _browser = null;
@@ -80,6 +80,7 @@ const StopJobs = (cronJobs) => {
 
 const PerformCheck = async (task) => {
   let success = await Lookup(task.page, task.lookupText, task.htmlQuery);
+  MonitorLog(`performed task ${task.title}, lookup result: ${success}`);
   if (!success) return;
   MonitorLog(`'${task.lookupText}' was found at ${task.url}`, true);
 }

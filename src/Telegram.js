@@ -72,14 +72,12 @@ bot.onText(/\/restartMonitor/, async (msg) => {
   let response = "restarting...";
 
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
-  BroadcastMessage(response);
 
   await Monitor.StopMonitoring();
   await Monitor.StartMonitoring();
 
   response = "restart successful";
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
-  BroadcastMessage(response);
 });
 
 bot.onText(/\/taskStatus (\d+)/, async (msg, match) => {
@@ -97,7 +95,7 @@ bot.onText(/\/taskStatus (\d+)/, async (msg, match) => {
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
 });
 
-bot.onText(/\/tryScraper (.+)/, async (msg, match) => {
+bot.onText(/\/tryScraper (.+)/gms, async (msg, match) => {
   const chatId = msg.chat.id;
   let response = "";
   let parameters = null;
