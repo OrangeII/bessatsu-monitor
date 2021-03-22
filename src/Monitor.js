@@ -2,7 +2,7 @@ const Browser = require('./Browser.js');
 const $ = require('cheerio');
 const events = require('events');
 const CronJob = require('cron').CronJob;
-const { ReadConfig, PrettyTaskList } = require('./Config.js');
+const Config = require('./Config.js');
 
 var _browser = null;
 var _cronJobs = [];
@@ -10,8 +10,8 @@ var MonitorEvents = new events.EventEmitter();
 
 const StartMonitoring = async () => {
   //read config
-  let config = await ReadConfig();
-  MonitorLog(`starting monitor on config found:\n${await PrettyTaskList()}`);
+  let config = await Config.ReadConfig();
+  MonitorLog(`starting monitor on config found:\n${await Config.PrettyTaskList()}`);
 
   //open browser
   _browser = await Browser.OpenBrowser();
@@ -111,17 +111,30 @@ const GetTaskInfo = (index) => {
     index: index,
     url: task.url,
     title: task.title,
+    htmlQuery: task.htmlQuery,
+    lookupText: task.lookupText,
     isRunning: task.job.running,
     lastRun: task.job.lastDate(),
     nextRun: task.job.nextDate()
   };
 }
 
+const PrettyTaskList = async () => {
+  if (!_cronJobs) return;
+  let ret = "";
+  for (let i = 0; i < _cronJobs.length; i++) {
+    ret += `${i}: ${_cronJobs[i].title}\n`;
+  }
+  return ret;
+};
+
+
 module.exports = {
   StartMonitoring,
   StopMonitoring,
   Lookup,
   GetTaskInfo,
+  PrettyTaskList,
   MonitorEvents
 };
 

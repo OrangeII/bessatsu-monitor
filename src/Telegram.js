@@ -14,13 +14,18 @@ const BroadcastMessage = (text) => {
   bot.sendMessage(Config.Environment.TELEGRAM_BROADCAST_CHAT_ID, text);
 };
 
-bot.onText(/\/tasks/, async (msg) => {
+bot.onText(/\/tasks\s*(\-m)?/, async (msg, match) => {
   const chatId = msg.chat.id;
-  let response = await Config.PrettyTaskList();
+  let response = "";
+  console.log(match);
+  if (match.length > 1 && match[1] == '-m')
+    response = `tasks in loaded config:\n${await Monitor.PrettyTaskList()}`;
+  else
+    response = `tasks in remote config:\n${await Config.PrettyTaskList()}`;
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
 });
 
-bot.onText(/\/task (\d+)/, async (msg, match) => {
+bot.onText(/\/task\s*(\d+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const index = Number(match[1]);
   const task = await Config.GetTask(index);
@@ -33,7 +38,7 @@ bot.onText(/\/task (\d+)/, async (msg, match) => {
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
 });
 
-bot.onText(/\/addTask (.+)/, async (msg, match) => {
+bot.onText(/\/addTask\s*(.+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   let newTask = await Config.GetTaskTemplate();
   newTask.title = match[1];
@@ -42,7 +47,7 @@ bot.onText(/\/addTask (.+)/, async (msg, match) => {
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
 });
 
-bot.onText(/\/deleteTask (\d+)/, async (msg, match) => {
+bot.onText(/\/deleteTask\s*(\d+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const index = Number(match[1]);
   let response = "";
@@ -54,7 +59,7 @@ bot.onText(/\/deleteTask (\d+)/, async (msg, match) => {
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
 });
 
-bot.onText(/\/updateTask (\d+) (\w+) (.*)/, async (msg, match) => {
+bot.onText(/\/updateTask\s*(\d+) (\w+) (.*)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const index = Number(match[1]);
   let task = await Config.UpdateTask(index, match[2], match[3]);
@@ -80,7 +85,7 @@ bot.onText(/\/restartMonitor/, async (msg) => {
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
 });
 
-bot.onText(/\/taskStatus (\d+)/, async (msg, match) => {
+bot.onText(/\/taskStatus\s*(\d+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const index = Number(match[1]);
 
@@ -95,7 +100,7 @@ bot.onText(/\/taskStatus (\d+)/, async (msg, match) => {
   bot.sendMessage(chatId, response, { reply_to_message_id: msg.message_id });
 });
 
-bot.onText(/\/tryScraper (.+)/gms, async (msg, match) => {
+bot.onText(/\/tryScraper\s*(.+)/gms, async (msg, match) => {
   const chatId = msg.chat.id;
   let response = "";
   let parameters = null;
